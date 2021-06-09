@@ -1,0 +1,12 @@
+namePrefix: frontend-
+
+resources:
+  - deployment.yaml
+  - service.yaml
+
+patches:
+  - replicas_count.yaml
+
+images:
+  - name: pefish/template
+    newTag: "latest"

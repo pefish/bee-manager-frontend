@@ -1,0 +1,29 @@
+name: CI
+
+on: 
+  create:
+    tags:
+      - 'v*.*.*'
+
+env:
+  USERNAME: pefish
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: checkout codes
+      uses: actions/checkout@master
+    - name: Set env
+      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+    - name: docker login
+      run: |
+        docker login -u "${{env.USERNAME}}" -p "${{ secrets.DOCKER_PASSWORD }}"
+    - name: docker build
+      run: |
+        docker build -t ${{env.USERNAME}}/bee-manager-frontend:${{env.RELEASE_VERSION}} .
+    - name: docker push
+      run: |
+        docker push ${{env.USERNAME}}/bee-manager-frontend:${{env.RELEASE_VERSION}}
