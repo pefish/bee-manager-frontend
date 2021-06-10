@@ -1,14 +1,13 @@
 import { observable } from 'mobx';
-import CommonStore from './common_store';
-import { withGlobalLoading, wrapPromise } from '../util/decorator';
+import { withGlobalLoading, wrapPromiseWithErrorTip, withLogout } from '../util/decorator';
 import HttpRequestUtil from "@pefish/js-util-httprequest"
-import { ReturnType } from '../util/type';
 import config from "../config/index"
+import {commonStore} from "./init";
+import {Modal} from "antd"
 
 const isWebMediaString = "(min-width: 996px)"
 export default class HomeStore {
 
-  private commonStore: CommonStore
   @observable
   public counter = 0;
 
@@ -27,9 +26,20 @@ export default class HomeStore {
   @observable public nodeTabTotal: number = 0
 
 
-  constructor (commonStore: CommonStore) {
-    this.commonStore = commonStore
+  @observable public execCommandTabResult: string = ``
+  @observable public execCommandTabSelectedCommand: string = ""
+  public execCommandTabCommands: {[key: string]: {
+      text: string,
+      tip: string,
+      params: string[],
+    }} = {
+    "list_all_ticket": {
+      text: "查询所有节点获取的所有票",
+      tip: "不要过于频繁执行此命令，否则影响节点出票",
+      params: []
+    }
   }
+
 
   public setMediaListeners () {
     this.isWebMatchMedia.addListener(e => {
@@ -41,13 +51,13 @@ export default class HomeStore {
     this.selectedMenu = key
   }
 
+  @wrapPromiseWithErrorTip()
   @withGlobalLoading()
-  @wrapPromise()
   public async loginOrLogout (): Promise<any> {
-    if (this.commonStore.persistenceStore.get("jwt")) {
+    if (commonStore.persistenceStore.get("jwt")) {
       // logout
-      this.commonStore.persistenceStore.remove("jwt")
-      this.commonStore.persistenceStore.remove("username")
+      commonStore.persistenceStore.remove("jwt")
+      commonStore.persistenceStore.remove("username")
       return null
     } else {
       // login
@@ -64,8 +74,8 @@ export default class HomeStore {
         throw new Error(result.msg)
       }
       this.loginModalVisible = false
-      this.commonStore.persistenceStore.set("jwt", result.data.token)
-      this.commonStore.persistenceStore.set("username", this.loginUsername)
+      commonStore.persistenceStore.set("jwt", result.data.token)
+      commonStore.persistenceStore.set("username", this.loginUsername)
       // if (this.selectedMenu === "node") {
       //   await this.nodeTabFetchNodes()
       // }
@@ -74,19 +84,20 @@ export default class HomeStore {
 
   }
 
+  @wrapPromiseWithErrorTip()
+  @withLogout("loginOrLogout")
   @withGlobalLoading()
-  @wrapPromise()
   public async nodeTabFetchNodes (): Promise<any> {
-    if (!this.commonStore.persistenceStore.get("jwt")) {
+    if (!commonStore.persistenceStore.get("jwt")) {
       throw new Error("请先登录")
     }
-    const result = await HttpRequestUtil.get(config["urls"][this.commonStore.persistenceStore.get("username")] + "/node", {
+    const result = await HttpRequestUtil.get(config["urls"][commonStore.persistenceStore.get("username")] + "/node", {
       params: {
         "page": this.nodeTabPage,
         "size": this.nodeTabPageSize
       },
       headers: {
-        "jwt": this.commonStore.persistenceStore.get("jwt")
+        "jwt": commonStore.persistenceStore.get("jwt")
       }
     })
     if (result.code !== 0) {
@@ -94,5 +105,22 @@ export default class HomeStore {
     }
     this.nodeTabData = result.data.datas
     this.nodeTabTotal = result.data.total
+  }
+
+  @wrapPromiseWithErrorTip()
+  @withLogout("loginOrLogout")
+  @withGlobalLoading()
+  public async execCommandTabExec (): Promise<any> {
+    if (this.execCommandTabSelectedCommand === "list_all_ticket") {
+      // 拉取节点数量
+
+      // 循环每个节点，获取每个节点的票
+
+      Modal.error({
+        content: "暂未实现"
+      })
+    } else {
+      throw new Error("错误的命令")
+    }
   }
 }

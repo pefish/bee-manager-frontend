@@ -7,6 +7,7 @@ import HomeStore from '../store/home_store';
 import CommonStore from '../store/common_store';
 import MyModal from "../component/my_modal";
 import NodeTabContent from "./home/node_tab_content";
+import ExecCommandTabContent from "./home/exec_command_tab_content";
 
 
 const {Sider} = Layout;
@@ -29,6 +30,10 @@ export default class Home extends React.Component<{
     if (this.props.homeStore!.selectedMenu === "node") {
       return (
         <NodeTabContent/>
+      )
+    } else if (this.props.homeStore!.selectedMenu === "command") {
+      return (
+        <ExecCommandTabContent/>
       )
     } else {
       return (
@@ -123,6 +128,9 @@ export default class Home extends React.Component<{
                   }}>
                     <Menu.Item key="node" icon={<UserOutlined/>}>
                       节点管理
+                    </Menu.Item>
+                    <Menu.Item key="command" icon={<UserOutlined/>}>
+                      执行命令
                     </Menu.Item>
                   </Menu>
                 </Sider>
