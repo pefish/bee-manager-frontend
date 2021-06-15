@@ -3,7 +3,7 @@ import { withGlobalLoading, wrapPromiseWithErrorTip, withLogout } from '../util/
 import HttpRequestUtil from "@pefish/js-util-httprequest"
 import config from "../config/index"
 import {commonStore} from "./init";
-import {Modal} from "antd"
+import {StringUtil} from "@pefish/js-node-assist"
 
 const isWebMediaString = "(min-width: 996px)"
 export default class HomeStore {
@@ -112,13 +112,79 @@ export default class HomeStore {
   @withGlobalLoading()
   public async execCommandTabExec (): Promise<any> {
     if (this.execCommandTabSelectedCommand === "list_all_ticket") {
-      // 拉取节点数量
+      let page = 1
+      while (true) {
+        // 拉取节点
+        const result = await HttpRequestUtil.get(config["urls"][commonStore.persistenceStore.get("username")] + "/node", {
+          params: {
+            "page": page,
+            "size": 20
+          },
+          headers: {
+            "jwt": commonStore.persistenceStore.get("jwt")
+          }
+        })
+        if (result.code !== 0) {
+          throw new Error(result.msg)
+        }
+        const nodes = result.data.datas
+        if (nodes.length === 0) {
+          break
+        }
+        // 循环每个节点，获取每个节点的票
+        for (const node of nodes) {
+          if (this.execCommandTabResult) {
+            this.execCommandTabResult += "\n"
+          }
+          this.execCommandTabResult += `${node.name}:`
+          const result = await HttpRequestUtil.post(config["urls"][commonStore.persistenceStore.get("username")] + "/request", {
+            params: {
+              "url": node.url,
+              "path": "/chequebook/cheque",
+              "method": "GET"
+            },
+            headers: {
+              "jwt": commonStore.persistenceStore.get("jwt")
+            }
+          })
+          if (result.code !== 0) {
+            this.execCommandTabResult += ` ${result.msg}`
+            continue
+          }
+          if (result.data.lastcheques && result.data.lastcheques.length > 0) {
+            for (const lastcheque of result.data.lastcheques) {
+              if (!lastcheque.lastreceived) {
+                continue
+              }
+              this.execCommandTabResult += `\n\t${lastcheque.peer} ${StringUtil.start(lastcheque.lastreceived.payout).unShiftedBy(16).remainDecimal(8).end()}`
+              // 查询是否已经提取
+              const result = await HttpRequestUtil.post(config["urls"][commonStore.persistenceStore.get("username")] + "/request", {
+                params: {
+                  "url": node.url,
+                  "path": "/chequebook/cashout/" + lastcheque.peer,
+                  "method": "GET"
+                },
+                headers: {
+                  "jwt": commonStore.persistenceStore.get("jwt")
+                }
+              })
+              if (result.code !== 0) {
+                this.execCommandTabResult += ` ${result.msg}`
+                continue
+              }
+              if (result.data.uncashedAmount === 0) {
+                this.execCommandTabResult += ` 已兑现`
+              }
+              if (result.data.uncashedAmount < 0) {
+                this.execCommandTabResult += ` 废票`
+              }
+              document.getElementById("execCommandTabResult")!.scrollTop = document.getElementById("execCommandTabResult")!.scrollHeight
 
-      // 循环每个节点，获取每个节点的票
-
-      Modal.error({
-        content: "暂未实现"
-      })
+            }
+          }
+        }
+        page++
+      }
     } else {
       throw new Error("错误的命令")
     }

@@ -38,6 +38,11 @@ export default class NodeTabContent extends React.Component
             key: 'version',
           },
           {
+            title: 'Url',
+            dataIndex: 'url',
+            key: 'url',
+          },
+          {
             title: 'IsAlive',
             dataIndex: 'is_alive',
             key: 'is_alive',

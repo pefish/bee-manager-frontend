@@ -1678,6 +1678,13 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@pefish/js-node-assist@^2.0.8":
+  version "2.0.8"
+  resolved "https://registry.yarnpkg.com/@pefish/js-node-assist/-/js-node-assist-2.0.8.tgz#482e598f27396a0e6f837924e634c1e1be407bac"
+  integrity sha512-DUKmtlZ7SRSptya4lkU2CgkvYewfir8bu15HseqJrbFmeBnhTMpcvA/XFLZr5IV6NxntWPlP4CrKBJOc7CgNew==
+  dependencies:
+    bignumber.js "^9.0.1"
+
 "@pefish/js-util-desensitize@^0.1.0":
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/@pefish/js-util-desensitize/-/js-util-desensitize-0.1.0.tgz#8cec31858ee9b450512a7053dbbd1cca7c9933fd"
@@ -3153,6 +3160,11 @@ big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
   integrity sha512-vyL2OymJxmarO8gxMr0mhChsO9QGwhynfuu4+MHTAW6czfq9humCB7rKpUjDd9YUiDPU4mzpyupFSvOClAwbmQ==
+
+bignumber.js@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-9.0.1.tgz#8d7ba124c882bfd8e43260c67475518d0689e4e5"
+  integrity sha512-IdZR9mh6ahOBv/hYGiXyVuyCetmGJhtYkqLBpTStdhEGjegpPlUawydyaF3pbIOFynJTpllEs+NP+CS9jKFLjA==
 
 binary-extensions@^1.0.0:
   version "1.13.1"

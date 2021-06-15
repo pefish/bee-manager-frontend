@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@pefish/js-node-assist": "^2.0.8",
     "@pefish/js-util-httprequest": "^0.2.0",
     "antd": "^4.6.6",
     "mobx": "^5.15.7",

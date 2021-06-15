@@ -35,7 +35,8 @@ export default class ExecCommandTabContent extends React.Component
           }}>
             <div style={{
               marginRight: 10,
-              flex: 1
+              flex: 1,
+              display: "flex"
             }}>
               <Select showSearch placeholder="命令" style={{
                 width: "100%"
@@ -74,7 +75,7 @@ export default class ExecCommandTabContent extends React.Component
             :
             null
           }
-          <TextArea disabled={true} style={{
+          <TextArea id={"execCommandTabResult"} disabled={true} style={{
             height: "100%",
             backgroundColor: "black",
             color: "white",
